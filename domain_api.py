@@ -3,13 +3,13 @@ from configs.domain_key import get_api_key
 from logger import logger
 import json
 
-def get_listings_in_postcode(key: str, postcode: str, page_size: int = 1000):
+def get_listings_in_postcode(key: str, postcode: str, page_size: int = 200):
     """Get the current listings by postcode from Domain
 
     Args:
         key (str): Authentication key
         postcode (str): Postcode you want to search in
-        pagesize (int): Max number of listings to return. 1000 is the limit given by domain
+        pagesize (int): Max number of listings to return. 200 is the limit given by domain
 
     Returns:
         list: list of dicts for each listing
