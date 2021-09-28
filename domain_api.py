@@ -1,7 +1,9 @@
 import requests
-from configs.domain_key import get_api_key
 from logger import logger
 import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 def get_listings_in_postcode(key: str, postcode: str, page_size: int = 200):
     """Get the current listings by postcode from Domain
@@ -34,8 +36,8 @@ def get_listings_in_postcode(key: str, postcode: str, page_size: int = 200):
     return res.json()
 
 if __name__ == "__main__":
-    res = get_listings_in_postcode(get_api_key(), 3195)
-    logger.debug(res)
+    res = get_listings_in_postcode(os.environ.get('DOMAIN_API_KEY'), 3195)
+    logger.debug(os.environ.get('DOMAIN_API_KEY'))
 
     # with open("temp.json", "w") as outfile:
     #     outfile.write(json.dumps(res))

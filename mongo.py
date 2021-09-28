@@ -1,11 +1,13 @@
 from pymongo import MongoClient
-import datetime
-from configs.db import get_mongo_details
 from logger import logger
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 def connect_to_mongo_db(db_user = "", db_password = ""):
     if not db_user and not db_password:
-        db_user, db_password = get_mongo_details()
+        db_user = os.environ.get('MONGO_USERNAME')
+        db_password = os.environ.get('MONGO_PASSWORD')
     
     connection_string = f"mongodb+srv://{db_user}:{db_password}@raw-requests.gz569.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
     try:

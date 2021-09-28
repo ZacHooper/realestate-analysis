@@ -2,14 +2,15 @@ from prefect import task, Flow
 from domain_api import get_listings_in_postcode
 from logger import logger
 from mongo import connect_to_mongo_db, connect_to_domain_raw_collection, insert_into_collection
-from configs.db import get_mongo_details
-from configs.domain_key import get_api_key
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 @task
 def get_todays_listings_on_domain():
     # get new listings
-    key = get_api_key()
+    key = os.environ.get('DOMAIN_API_KEY')
     listings = get_listings_in_postcode(key, 3195)
     logger.info(f"{len(listings)} listings returned from domain API")
     return listings
@@ -17,7 +18,8 @@ def get_todays_listings_on_domain():
 @task
 def upload_raw_listings(data):
     # connect to db
-    db_user, db_password = get_mongo_details()
+    db_user = os.environ.get('MONGO_USERNAME')
+    db_password = os.environ.get('MONGO_PASSWORD')
     client = connect_to_mongo_db(db_user, db_password)
     collection = connect_to_domain_raw_collection(client)
     
