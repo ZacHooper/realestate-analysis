@@ -36,7 +36,7 @@ def get_listings_in_postcode(key: str, postcode: str, page_size: int = 200):
     return res.json()
 
 if __name__ == "__main__":
-    res = get_listings_in_postcode(os.environ.get('DOMAIN_API_KEY2'), 3195)
+    res = get_listings_in_postcode(os.environ.get('DOMAIN_API_KEY'), 3195)
     logger.debug(res)
 
     # with open("temp.json", "w") as outfile:
