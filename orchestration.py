@@ -12,6 +12,10 @@ def get_todays_listings_on_domain():
     # get new listings
     key = os.environ.get('DOMAIN_API_KEY')
     listings = get_listings_in_postcode(key, 3195)
+    if 'detail' in listings['listings']:
+        if listings['listings']['detail'] == "Unable to verify credentials":
+            logger.critical(f"Unable to verify domain credentials")
+            raise Exception(f"Unable to verify domain credentials")
     logger.info(f"{len(listings)} listings returned from domain API")
     return listings
     
