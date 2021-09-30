@@ -2,6 +2,7 @@ from pymongo import MongoClient, DESCENDING
 from bson.objectid import ObjectId
 from logger import logger
 import os
+import json
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -36,7 +37,7 @@ def insert_into_collection(coll, data):
     Returns:
         ObjectId: Unique ObjectId set for the document
     """
-    logger.debug(f"Inserting into collection ({coll.name}): {data}")
+    logger.debug(f"Inserting into collection ({coll.name}): {data.keys()}")
     try:
         object_id = coll.insert_one(data).inserted_id
         logger.debug(f"Successfully inserted data into collection. Object ID: {object_id}")
@@ -66,11 +67,31 @@ def read_recent_record(coll, objectId = None):
     logger.debug(f"Document found. Num of listings in Document: {len(data['listings'])}")
     return data
 
-def new_listings(coll, listing_ids):
-    coll.find({"listing_id":{"$in": listing_ids}})
+def which_new_listings(coll, listing_ids, return_existing = False):
+    """Check Mongo DB for wich listing IDs don't currently exist in the database
+
+    Args:
+        coll (Collection): MongoDB collection
+        listing_ids (list): List of listing_ids
+        return_existing (bool, optional): Option to return the existings IDs rather than new. Defaults to False.
+
+    Returns:
+        list: List of listing_ids
+    """
+    query = {"listing_id":{"$in": listing_ids}}
+    project = {"listing_id":1}
+    # Create a list of the listing ids found in the database
+    existing_listing_ids = [x['listing_id'] for x in coll.find(query, project)]
+    # Return the existing ids if requested
+    if return_existing:
+        return existing_listing_ids
+    # Only return the ids in listing ids but NOT in existing ids
+    return [x for x in listing_ids if x not in existing_listing_ids]
 
 if __name__ == "__main__":
     client = connect_to_mongo_db()
     domain_coll = connect_to_domain_raw_collection(client)
-    read_recent_record(domain_coll)
-    
+    listing_coll = connect_to_domain_listings(client)
+    listings = [2017273091, 2017272108, 2017278297, 12345, 67890, 9876, 54321]
+    new_listings = which_new_listings(listing_coll, listings)
+    print(new_listings)

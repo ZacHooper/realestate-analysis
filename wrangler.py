@@ -85,7 +85,7 @@ class Listing():
     saleMethod: str
     saleMode: str
     displayPrice: str
-    minimumPrice: int
+    minimumPrice: int 
     maximumPrice: int
     inspectionsByAppointmentOnly: bool
     url: str
@@ -122,18 +122,24 @@ class Listing():
             self.saleMethod = raw_listing['saleDetails']['saleMethod']
             self.saleMode = raw_listing['saleMode']
             self.displayPrice = raw_listing['priceDetails']['displayPrice']
-            self.minimumPrice = (raw_listing['priceDetails']['minimumPrice'] 
-                                 if 'minimumPrice' in raw_listing['priceDetails']
-                                 else get_minimum_price_from_display_price(raw_listing['priceDetails']['displayPrice']))
-            self.maximumPrice = (raw_listing['priceDetails']['maximumPrice'] 
-                                 if 'maximumPrice' in raw_listing['priceDetails']
-                                 else get_maximum_price_from_display_price(raw_listing['priceDetails']['displayPrice']))
             self.inspectionsByAppointmentOnly = raw_listing['inspectionDetails']['isByAppointmentOnly']
             self.url = raw_listing['seoUrl']
             self.statementOfInformation = raw_listing['statementOfInformation']['documentationUrl']
             self.location = HouseLocation(raw_listing['addressParts'], raw_listing['geoLocation'])
             self.house = HouseDetails(raw_listing)
             self.agent = Agent(raw_listing['advertiserIdentifiers'])
+            
+            # handle pricing
+            if 'price' in raw_listing['priceDetails']:
+                self.minimumPrice = self.maximumPrice = raw_listing['priceDetails']['price']
+            else:
+                self.minimumPrice = (raw_listing['priceDetails']['minimumPrice'] 
+                                 if 'minimumPrice' in raw_listing['priceDetails']
+                                 else get_minimum_price_from_display_price(raw_listing['priceDetails']['displayPrice']))
+                self.maximumPrice = (raw_listing['priceDetails']['maximumPrice'] 
+                                    if 'maximumPrice' in raw_listing['priceDetails']
+                                    else get_maximum_price_from_display_price(raw_listing['priceDetails']['displayPrice']))
+                
             
     def __post_init__(self):
         self.minimumPrice = get_minimum_price_from_display_price(self.displayPrice)
@@ -209,7 +215,7 @@ def get_min_max_price_from_display_price(displayPrice):
 
 
 if __name__ == "__main__":
-    with open('examples/raw_listing_2.json', 'r') as infile:
+    with open('examples/raw_listing_3.json', 'r') as infile:
         raw_listing = json.load(infile)
         listing = Listing(raw_listing)
         print(json.dumps(listing.as_no_nested_dicts()))
