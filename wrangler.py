@@ -124,11 +124,15 @@ class Listing():
             self.displayPrice = raw_listing['priceDetails']['displayPrice']
             self.inspectionsByAppointmentOnly = raw_listing['inspectionDetails']['isByAppointmentOnly']
             self.url = raw_listing['seoUrl']
-            self.statementOfInformation = raw_listing['statementOfInformation']['documentationUrl']
+            
             self.location = HouseLocation(raw_listing['addressParts'], raw_listing['geoLocation'])
             self.house = HouseDetails(raw_listing)
             self.agent = Agent(raw_listing['advertiserIdentifiers'])
             
+            # Handle statementOfInformation
+            if 'statementOfInformation' in raw_listing:
+                self.statementOfInformation = raw_listing['statementOfInformation']['documentationUrl']
+                
             # handle pricing
             if 'price' in raw_listing['priceDetails']:
                 self.minimumPrice = self.maximumPrice = raw_listing['priceDetails']['price']

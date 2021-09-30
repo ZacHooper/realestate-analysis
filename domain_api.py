@@ -43,8 +43,7 @@ def get_listing(key: str, listing_id: int):
     
 
 if __name__ == "__main__":
-    res = get_listing(os.environ.get('DOMAIN_API_KEY'), 2017272108)
-    logger.debug(res)
+    res = get_listing(os.environ.get('DOMAIN_API_KEY'), 2014185864)
 
-    with open("examples/raw_listing_3.json", "w") as outfile:
+    with open("examples/raw_listing_4.json", "w") as outfile:
         outfile.write(json.dumps(res))

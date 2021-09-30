@@ -87,7 +87,7 @@ with Flow("scrape-raw-from-domain") as flow:
     listing_ids = get_listing_ids(listings)
     new_listing_ids = check_for_new_listings(listing_ids)
     # Get details for new listings
-    new_listings = get_new_listing_details.map(new_listing_ids[1:3])
+    new_listings = get_new_listing_details.map(new_listing_ids)
     # Upload new listings to mongo
     new_listing_objectIds = add_new_listing_to_mongo.map(new_listings)
     # Check which listings are sold
