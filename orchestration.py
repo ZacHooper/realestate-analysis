@@ -1,7 +1,8 @@
 from prefect import task, Flow
 from domain_api import get_listings_in_postcode
 from logger import logger
-from mongo import connect_to_mongo_db, connect_to_domain_raw_collection, insert_into_collection
+from mongo import (connect_to_mongo_db, connect_to_domain_raw_collection, 
+                   insert_into_collection, connect_to_domain_listings)
 from datetime import datetime
 import os
 from dotenv import load_dotenv
@@ -40,8 +41,26 @@ def upload_raw_listings(data):
     
     return objectId
 
+@task
+def check_for_new_listings():
+    # connect to db
+    db_user = os.environ.get('MONGO_USERNAME')
+    db_password = os.environ.get('MONGO_PASSWORD')
+    client = connect_to_mongo_db(db_user, db_password)
+    collection = connect_to_domain_listings(client)
+    
+
 with Flow("scrape-raw-from-domain") as flow:
     listings = get_todays_listings_on_domain()
     objectId = upload_raw_listings(listings)
+    # Check which listings are new
+    
+    # Get details for new listings
+    
+    # Upload new listings to mongo
+    
+    # Check which listings are sold
+    
+    # Update listing in mongo
 
 flow.register(project_name="realestate-analysis")

@@ -1,4 +1,5 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, DESCENDING
+from bson.objectid import ObjectId
 from logger import logger
 import os
 from dotenv import load_dotenv
@@ -22,6 +23,9 @@ def connect_to_mongo_db(db_user = "", db_password = ""):
 def connect_to_domain_raw_collection(client):
     return client['raw-requests'].domain
 
+def connect_to_domain_listings(client):
+    return client['raw-requests'].listings
+
 def insert_into_collection(coll, data):
     """Inserts a JSON object into a MongoDB collection
 
@@ -42,6 +46,31 @@ def insert_into_collection(coll, data):
 
     return object_id
 
+def read_recent_record(coll, objectId = None):
+    """Get's the last inserted document into the collection. 
+    If specific objectId provided will instead get that exact document.
+
+    Args:
+        coll (Collection): Pymongo collection
+        objectId (ObjectId, optional): ObjectId of the specific document to get. Defaults to None.
+
+    Returns:
+        dict: Document from MongoDB Collection
+    """
+    if objectId is not None:
+        logger.debug(f"Finding document with ObjectId: {objectId}")
+        data = coll.find_one({"_id": objectId})
+    else:
+        data = coll.find_one(sort=[('_id', DESCENDING)])
+    
+    logger.debug(f"Document found. Num of listings in Document: {len(data['listings'])}")
+    return data
+
+def new_listings(coll, listing_ids):
+    coll.find({"listing_id":{"$in": listing_ids}})
+
 if __name__ == "__main__":
     client = connect_to_mongo_db()
     domain_coll = connect_to_domain_raw_collection(client)
+    read_recent_record(domain_coll)
+    
