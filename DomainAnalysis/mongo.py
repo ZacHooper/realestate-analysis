@@ -1,6 +1,6 @@
 from pymongo import MongoClient, DESCENDING
 from bson.objectid import ObjectId
-from logger import logger
+from DomainAnalysis.logger import logger
 import os
 import json
 from dotenv import load_dotenv

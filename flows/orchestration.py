@@ -1,11 +1,13 @@
 from prefect import task, Flow
-from domain_api import get_listings_in_postcode, get_listing
-from logger import logger
-from mongo import (connect_to_mongo_db, connect_to_domain_raw_collection, 
+from prefect.storage.github import GitHub
+from prefect.run_configs.docker import DockerRun
+from DomainAnalysis.domain_api import get_listings_in_postcode, get_listing
+from DomainAnalysis.logger import logger
+from DomainAnalysis.mongo import (connect_to_mongo_db, connect_to_domain_raw_collection, 
                    insert_into_collection, connect_to_domain_listings,
                    which_new_listings)
 from datetime import datetime
-from wrangler import Listing
+from DomainAnalysis.wrangler import Listing
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -98,6 +100,8 @@ with Flow("scrape-raw-from-domain") as flow:
     
     # Update listing in mongo
     
-flow.run()
+# flow.run()
 
+flow.storage = GitHub(repo = "zachooper/domain-analysis", path="/flows/orchestration.py")
+flow.run_config = DockerRun(image = "zhooper/domain-analysis")
 # flow.register(project_name="realestate-analysis")

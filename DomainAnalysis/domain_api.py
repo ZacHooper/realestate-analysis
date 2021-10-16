@@ -1,5 +1,5 @@
 import requests
-from logger import logger
+from DomainAnalysis.logger import logger
 import json
 import os
 from dotenv import load_dotenv

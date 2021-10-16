@@ -1,6 +1,6 @@
-from domain_api import get_listings_in_postcode
-from logger import logger
-from mongo import connect_to_mongo_db, connect_to_domain_raw_collection, insert_into_collection
+from DomainAnalysis.domain_api import get_listings_in_postcode
+from DomainAnalysis.logger import logger
+from DomainAnalysis.mongo import connect_to_mongo_db, connect_to_domain_raw_collection, insert_into_collection
 from configs.db import get_mongo_details
 from configs.domain_key import get_api_key
 from datetime import datetime

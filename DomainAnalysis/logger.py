@@ -2,7 +2,7 @@ import logging
 
 from requests.api import get
 
-def get_logger(filepath = "logs/scraper.log", filepath_level = logging.INFO, console_level = logging.DEBUG):
+def get_logger(filepath = "scraper.log", filepath_level = logging.INFO, console_level = logging.DEBUG):
     mylogs = logging.getLogger(__name__)
     mylogs.setLevel(logging.DEBUG)
 
