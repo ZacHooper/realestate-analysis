@@ -1,3 +1,7 @@
+# TODO: Handle when the price isn't a value but a text like "CONTACT AGENT"
+# TODO: If price is auction or not available in the JSON response at all read the statement of information (if available) as the price HAS to be in there by law.
+
+
 from dataclasses import asdict, dataclass, field
 import datetime
 import json
@@ -124,7 +128,6 @@ class Listing():
             self.displayPrice = raw_listing['priceDetails']['displayPrice']
             self.inspectionsByAppointmentOnly = raw_listing['inspectionDetails']['isByAppointmentOnly']
             self.url = raw_listing['seoUrl']
-            
             self.location = HouseLocation(raw_listing['addressParts'], raw_listing['geoLocation'])
             self.house = HouseDetails(raw_listing)
             self.agent = Agent(raw_listing['advertiserIdentifiers'])
@@ -136,7 +139,7 @@ class Listing():
             # handle pricing
             if 'price' in raw_listing['priceDetails']:
                 self.minimumPrice = self.maximumPrice = raw_listing['priceDetails']['price']
-            else:
+            elif '$' in raw_listing['priceDetails']:
                 self.minimumPrice = (raw_listing['priceDetails']['minimumPrice'] 
                                  if 'minimumPrice' in raw_listing['priceDetails']
                                  else get_minimum_price_from_display_price(raw_listing['priceDetails']['displayPrice']))

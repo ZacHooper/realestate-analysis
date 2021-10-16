@@ -64,7 +64,11 @@ def get_new_listing_details(listing_id):
     key = os.environ.get('DOMAIN_API_KEY')
     logger.debug(f"Getting listing for listing_id: {listing_id}")
     raw_listing = get_listing(key, listing_id)
-    return Listing(raw_listing)
+    try:
+        listing = Listing(raw_listing)
+        return listing
+    except Exception as e:
+        logger.critical(f"Unable to creating listing class due to: {e}")
 
 @task
 def add_new_listing_to_mongo(listing: Listing):

@@ -44,6 +44,7 @@ def get_listing(key: str, listing_id: int):
 
 if __name__ == "__main__":
     res = get_listing(os.environ.get('DOMAIN_API_KEY'), 2014185864)
+    print(res)
 
-    with open("examples/raw_listing_4.json", "w") as outfile:
-        outfile.write(json.dumps(res))
+    # with open("examples/raw_listing_4.json", "w") as outfile:
+    #     outfile.write(json.dumps(res))
