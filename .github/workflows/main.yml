@@ -23,7 +23,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: mr-smithers-excellent/docker-build-push@v5
-      - with:
+        with:
           image: docker-hub-repo/image-name
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
