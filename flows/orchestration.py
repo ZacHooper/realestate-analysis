@@ -11,8 +11,6 @@ from datetime import datetime
 from DomainAnalysis.wrangler import Listing
 import os
 from dotenv import load_dotenv
-import pymongo
-from pymongo import collection
 load_dotenv()
 
 @task
