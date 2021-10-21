@@ -95,7 +95,7 @@ with Flow("scrape-raw-from-domain") as flow:
     domain_key = PrefectSecret('DOMAIN_API_KEY')
     
     # Params
-    postcodes = Parameter('postcodes', default=3195)
+    postcodes = Parameter('postcodes', default=["3228","3227","3226","3230","3231", "3220", "3218", "3195"])
     
     # Connect to Mongo
     client = connect_to_mongo(db_user, db_password)
@@ -108,7 +108,7 @@ with Flow("scrape-raw-from-domain") as flow:
     # 3220: Geelong City / Newtown
     # 3218: Geelong West
     
-    listings = get_todays_listings_on_domain(domain_key, 3195)
+    listings = get_todays_listings_on_domain(domain_key, postcodes)
     objectId = upload_raw_listings(client, listings)
     # Check which listings are new
     listing_ids = get_listing_ids(listings)
@@ -125,4 +125,4 @@ flow.run()
 
 flow.storage = GitHub(repo = "ZacHooper/realestate-analysis", path="/flows/orchestration.py")
 flow.run_config = DockerRun(image = "zhooper/domain-analysis")
-# flow.register(project_name="realestate-analysis")
+# flow.register(project_name="realestate-analysis", labels=["testing"])
