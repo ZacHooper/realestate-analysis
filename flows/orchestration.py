@@ -1,4 +1,4 @@
-from prefect import task, Flow, unmapped
+from prefect import task, Flow, unmapped, Parameter
 from prefect.storage.github import GitHub
 from prefect.run_configs.docker import DockerRun
 from prefect.tasks.secrets import PrefectSecret
@@ -17,7 +17,7 @@ load_dotenv()
 def get_todays_listings_on_domain(domain_key, postcode):
     # get new listings
     listings = get_listings_in_postcode(domain_key, postcode)
-    if 'detail' in listings:
+    if type(listings) is dict:
         if listings['detail'] == "Unable to verify credentials":
             logger.critical(f"Unable to verify domain credentials")
             raise Exception(f"Unable to verify domain credentials")
@@ -94,8 +94,19 @@ with Flow("scrape-raw-from-domain") as flow:
     db_password = PrefectSecret('MONGO_PASSWORD')
     domain_key = PrefectSecret('DOMAIN_API_KEY')
     
+    # Params
+    postcodes = Parameter('postcodes', default=3195)
+    
     # Connect to Mongo
     client = connect_to_mongo(db_user, db_password)
+    
+    # 3228: Torquay
+    # 3227: Barwon Heads
+    # 3226: Ocean Grove
+    # 3230: Angelsea
+    # 3231: Airey's
+    # 3220: Geelong City / Newtown
+    # 3218: Geelong West
     
     listings = get_todays_listings_on_domain(domain_key, 3195)
     objectId = upload_raw_listings(client, listings)
