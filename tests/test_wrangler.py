@@ -17,7 +17,14 @@ def listing(raw_listing):
 def no_insp_listing():
     with open('examples/faulty_inspectionDetails.json', 'r') as infile:
         l = json.load(infile)
+        return l
     
+@pytest.fixture
+def no_street_number():
+    with open('examples/faulty_streetNumber.json', 'r') as infile:
+        l = json.load(infile)
+    return l
+
 def test_get_minimum_price_from_display_price(raw_listing):
     displayPrice1 = "$950,000 - $1,050,000"
     displayPrice2 = "950,000 - 1,050,000"
@@ -134,4 +141,25 @@ def test_lising_asdict(listing):
     assert all([not isinstance(y[1],dict) for y in  listing.as_no_nested_dicts().items()])
     
 def test_listing_with_no_inspectionDetails(no_insp_listing):
-    pass
+    l = Listing(no_insp_listing)
+    assert isinstance(l, Listing)
+    assert l.inspectionsByAppointmentOnly == None
+    
+def test_listing_is_suburb_address(no_insp_listing: Listing):
+    l = Listing(no_insp_listing)
+    assert isinstance(l, Listing)
+    assert l.location.streetNumber == None
+    assert l.location.postcode == "3195"
+    
+def test_no_geolocation(no_insp_listing: Listing):
+    l = Listing(no_insp_listing)
+    assert l.location.latitude == None
+    
+def test_if_no_street_number_present(no_street_number):
+    l = Listing(no_street_number)
+    assert l.location.streetNumber == None
+    
+def test_only_one_price_in_display_price(no_street_number):
+    l = Listing(no_street_number)
+    assert l.minimumPrice == 600000
+    

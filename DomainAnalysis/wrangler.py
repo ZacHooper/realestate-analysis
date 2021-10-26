@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, field
 import datetime
 import json
 from collections.abc import MutableMapping
+import re
 
 @dataclass
 class Agent():
@@ -28,24 +29,36 @@ class Agent():
      
 @dataclass        
 class HouseLocation():
-    state: str
-    streetNumber: str
-    street: str
-    suburb: str
-    postcode: str
-    displayAddress: str
-    latitude: float
-    longitude: float
+    state: str = None
+    streetNumber: str = None
+    unitNumber: str = None
+    street: str = None
+    suburb: str = None
+    postcode: str = None
+    displayAddress: str = None
+    latitude: float = None
+    longitude: float = None
     
-    def __init__(self, addressParts, geoLocation) -> None:        
-        self.state = addressParts['stateAbbreviation'].upper()
-        self.streetNumber = addressParts['streetNumber']
-        self.street = addressParts['street']
-        self.suburb = addressParts['suburb']
-        self.postcode = addressParts['postcode']
-        self.displayAddress = addressParts['displayAddress']
-        self.latitude = geoLocation['latitude']
-        self.longitude = geoLocation['longitude']
+    def __init__(self, addressParts, geoLocation) -> None:   
+        if addressParts:
+            if addressParts['displayType'] == 'fullAddress':
+                self.state = addressParts['stateAbbreviation'].upper()
+                self.streetNumber = addressParts['streetNumber'] if 'streetNumber' in addressParts else None
+                self.unitNumber = addressParts['unitNumber'] if 'unitNumber' in addressParts else None
+                self.street = addressParts['street']
+                self.suburb = addressParts['suburb']
+                self.postcode = addressParts['postcode']
+                self.displayAddress = addressParts['displayAddress']
+            elif addressParts['displayType'] == 'suburbOnly':
+                self.state = addressParts['stateAbbreviation'].upper()
+                self.suburb = addressParts['suburb']
+                self.postcode = addressParts['postcode']
+                self.displayAddress = addressParts['displayAddress']
+        
+        if geoLocation:
+            self.latitude = geoLocation['latitude']
+            self.longitude = geoLocation['longitude']
+        
         
 @dataclass        
 class HouseDetails():
@@ -130,7 +143,12 @@ class Listing():
                                                  if 'inspectionDetails' in raw_listing
                                                  else None)
             self.url = raw_listing['seoUrl']
-            self.location = HouseLocation(raw_listing['addressParts'], raw_listing['geoLocation'])
+            
+            # Handle House Location
+            geoLocation = raw_listing['geoLocation'] if 'geoLocation' in raw_listing else None
+            address = raw_listing['addressParts'] if 'addressParts' in raw_listing else None
+            self.location = HouseLocation(address, geoLocation)
+                
             self.house = HouseDetails(raw_listing)
             self.agent = Agent(raw_listing['advertiserIdentifiers'])
             
@@ -142,13 +160,20 @@ class Listing():
             if 'price' in raw_listing['priceDetails']:
                 self.minimumPrice = self.maximumPrice = raw_listing['priceDetails']['price']
             elif '$' in raw_listing['priceDetails']['displayPrice']:
-                self.minimumPrice = (raw_listing['priceDetails']['minimumPrice'] 
-                                 if 'minimumPrice' in raw_listing['priceDetails']
-                                 else get_minimum_price_from_display_price(raw_listing['priceDetails']['displayPrice']))
-                self.maximumPrice = (raw_listing['priceDetails']['maximumPrice'] 
-                                    if 'maximumPrice' in raw_listing['priceDetails']
-                                    else get_maximum_price_from_display_price(raw_listing['priceDetails']['displayPrice']))
-                
+                # Check to see if on or two prices
+                displayPrice = raw_listing['priceDetails']['displayPrice']
+                if displayPrice.count("$") < 2:
+                    self.minimumPrice = self.maximumPrice = get_minimum_price_from_display_price(displayPrice)
+                else:
+                    self.minimumPrice = (raw_listing['priceDetails']['minimumPrice'] 
+                                    if 'minimumPrice' in raw_listing['priceDetails']
+                                    else get_minimum_price_from_display_price(displayPrice))
+                    self.maximumPrice = (raw_listing['priceDetails']['maximumPrice'] 
+                                        if 'maximumPrice' in raw_listing['priceDetails']
+                                        else get_maximum_price_from_display_price(displayPrice))
+               
+        # if self.listing_id is None:
+        #     raise ValueError("Listing Id can't be None") 
             
     def __post_init__(self):
         self.minimumPrice = get_minimum_price_from_display_price(self.displayPrice)
@@ -188,8 +213,9 @@ def get_minimum_price_from_display_price(displayPrice):
     displayPrice = displayPrice.replace(",", "")
     displayPrice = displayPrice.replace(" ", "")
     
+    
     # Handle a range price eg "$950,000 - $1,050,000"
-    return int(displayPrice.split("-")[0])
+    return convert_to_integer(displayPrice.split("-")[0])
 
 def get_maximum_price_from_display_price(displayPrice):
     """Get's the maximum value described in a display price. 
@@ -207,7 +233,7 @@ def get_maximum_price_from_display_price(displayPrice):
     displayPrice = displayPrice.replace(" ", "")
     
     # Handle a range price eg "$950,000 - $1,050,000"
-    return int(displayPrice.split("-")[1])
+    return convert_to_integer(displayPrice.split("-")[1])
 
 def get_min_max_price_from_display_price(displayPrice):
     """Get's the maximum value described in a display price. 
@@ -221,11 +247,19 @@ def get_min_max_price_from_display_price(displayPrice):
     """    
     return (get_minimum_price_from_display_price(displayPrice),
             get_maximum_price_from_display_price(displayPrice))
+    
+def convert_to_integer(string):
+    return int(re.findall('\d+', string )[0])
 
 
 if __name__ == "__main__":
     from domain_api import get_listing
     import os
+    
+    with open('examples/faulty_inspectionDetails.json') as infile:
+        listing = json.load(infile)
+        l = Listing(listing)
+        print(l)
     
     with open('examples/raw_search.json', 'r') as infile:
         listings = json.load(infile)
@@ -242,7 +276,7 @@ if __name__ == "__main__":
                 # print(l['listing']['id'])
         print(len(failed))
         print(failed)            
-        # print(json.dumps(listing.as_no_nested_dicts()))
+        print(json.dumps(listing.as_no_nested_dicts()))
         
     
 
