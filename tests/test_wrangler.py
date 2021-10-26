@@ -1,7 +1,7 @@
 import json
 import datetime
 import pytest
-from wrangler import *
+from DomainAnalysis.wrangler import *
 
 @pytest.fixture
 def raw_listing():
@@ -12,6 +12,11 @@ def raw_listing():
 @pytest.fixture
 def listing(raw_listing):
     return Listing(raw_listing)
+
+@pytest.fixture
+def no_insp_listing():
+    with open('examples/faulty_inspectionDetails.json', 'r') as infile:
+        l = json.load(infile)
     
 def test_get_minimum_price_from_display_price(raw_listing):
     displayPrice1 = "$950,000 - $1,050,000"
@@ -127,3 +132,6 @@ def test_listing_class_dict(raw_listing):
 def test_lising_asdict(listing):
     # Check to see that not items are nested objects
     assert all([not isinstance(y[1],dict) for y in  listing.as_no_nested_dicts().items()])
+    
+def test_listing_with_no_inspectionDetails(no_insp_listing):
+    pass

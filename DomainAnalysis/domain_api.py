@@ -88,8 +88,12 @@ def get_listing(key: str, listing_id: int):
     
 
 if __name__ == "__main__":
-    listings = get_listings_in_postcode(os.environ.get("DOMAIN_API_KEY"), ["3228","3227","3226","3230","3231", "3220", "3218", "3195"])
-    print(len(listings))
+    # listings = get_listings_in_postcode(os.environ.get("DOMAIN_API_KEY"), ["3228","3227","3226","3230","3231", "3220", "3218", "3195"])
+    # # print(len(listings))
+    
+    listing = get_listing(os.environ.get("DOMAIN_API_KEY"), "2016826357")
 
-    # with open("examples/raw_listing_4.json", "w") as outfile:
-    #     outfile.write(json.dumps(res))
+    with open("examples/faulty_inspectionDetails.json", "w") as outfile:
+        outfile.write(json.dumps(listing))
+    
+    

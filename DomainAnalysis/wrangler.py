@@ -126,7 +126,9 @@ class Listing():
             self.saleMethod = raw_listing['saleDetails']['saleMethod']
             self.saleMode = raw_listing['saleMode']
             self.displayPrice = raw_listing['priceDetails']['displayPrice']
-            self.inspectionsByAppointmentOnly = raw_listing['inspectionDetails']['isByAppointmentOnly']
+            self.inspectionsByAppointmentOnly = (raw_listing['inspectionDetails']['isByAppointmentOnly'] 
+                                                 if 'inspectionDetails' in raw_listing
+                                                 else None)
             self.url = raw_listing['seoUrl']
             self.location = HouseLocation(raw_listing['addressParts'], raw_listing['geoLocation'])
             self.house = HouseDetails(raw_listing)
@@ -139,7 +141,7 @@ class Listing():
             # handle pricing
             if 'price' in raw_listing['priceDetails']:
                 self.minimumPrice = self.maximumPrice = raw_listing['priceDetails']['price']
-            elif '$' in raw_listing['priceDetails']:
+            elif '$' in raw_listing['priceDetails']['displayPrice']:
                 self.minimumPrice = (raw_listing['priceDetails']['minimumPrice'] 
                                  if 'minimumPrice' in raw_listing['priceDetails']
                                  else get_minimum_price_from_display_price(raw_listing['priceDetails']['displayPrice']))
@@ -222,10 +224,25 @@ def get_min_max_price_from_display_price(displayPrice):
 
 
 if __name__ == "__main__":
-    with open('examples/raw_listing_3.json', 'r') as infile:
-        raw_listing = json.load(infile)
-        listing = Listing(raw_listing)
-        print(json.dumps(listing.as_no_nested_dicts()))
+    from domain_api import get_listing
+    import os
+    
+    with open('examples/raw_search.json', 'r') as infile:
+        listings = json.load(infile)
+        print(len(listings))
+        failed = []
+        for l in listings:
+            try:
+                listing = get_listing(os.environ.get("DOMAIN_API_KEY"), l['listing']['id'])
+                listing_obj = Listing(listing)
+                # print(listing.as_no_nested_dicts())
+            except Exception as e:
+                print(e)
+                failed.append(l['listing']['id'])
+                # print(l['listing']['id'])
+        print(len(failed))
+        print(failed)            
+        # print(json.dumps(listing.as_no_nested_dicts()))
         
     
 
