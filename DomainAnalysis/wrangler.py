@@ -7,6 +7,7 @@ import datetime
 import json
 from collections.abc import MutableMapping
 import re
+from DomainAnalysis.logger import logger
 
 @dataclass
 class Agent():
@@ -215,7 +216,11 @@ def get_minimum_price_from_display_price(displayPrice):
     
     
     # Handle a range price eg "$950,000 - $1,050,000"
-    return convert_to_integer(displayPrice.split("-")[0])
+    try:
+        return convert_to_integer(displayPrice.split("-")[0])
+    except:
+        logger.critical(f"Unable to get_minimum_price_from_display_price for price: {displayPrice}")
+        raise ValueError(f"Unable to get_minimum_price_from_display_price for price: {displayPrice}")
 
 def get_maximum_price_from_display_price(displayPrice):
     """Get's the maximum value described in a display price. 
@@ -233,7 +238,11 @@ def get_maximum_price_from_display_price(displayPrice):
     displayPrice = displayPrice.replace(" ", "")
     
     # Handle a range price eg "$950,000 - $1,050,000"
-    return convert_to_integer(displayPrice.split("-")[1])
+    try:
+        return convert_to_integer(displayPrice.split("-")[1])
+    except:
+        logger.critical(f"Unable to get_maximum_price_from_display_price for price: {displayPrice}")
+        raise ValueError(f"Unable to get_maximum_price_from_display_price for price: {displayPrice}")
 
 def get_min_max_price_from_display_price(displayPrice):
     """Get's the maximum value described in a display price. 
