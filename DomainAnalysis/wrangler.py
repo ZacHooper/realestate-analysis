@@ -276,7 +276,7 @@ if __name__ == "__main__":
                 # print(l['listing']['id'])
         print(len(failed))
         print(failed)            
-        print(json.dumps(listing.as_no_nested_dicts()))
+        # print(json.dumps(listing.as_no_nested_dicts()))
         
     
 
