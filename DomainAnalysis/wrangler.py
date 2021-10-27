@@ -199,7 +199,7 @@ class Listing():
         
 
 
-def get_minimum_price_from_display_price(displayPrice):
+def get_minimum_price_from_display_price(displayPrice: str):
     """Get's the minimum value described in a display price. 
     Display price should be in the format "$950,000 - $1,050,000" 
 
@@ -217,7 +217,7 @@ def get_minimum_price_from_display_price(displayPrice):
     
     # Handle a range price eg "$950,000 - $1,050,000"
     try:
-        return convert_to_integer(displayPrice.split("-")[0])
+        return convert_to_integer(re.split(r'-|to', displayPrice)[0])
     except:
         logger.critical(f"Unable to get_minimum_price_from_display_price for price: {displayPrice}")
         raise ValueError(f"Unable to get_minimum_price_from_display_price for price: {displayPrice}")
@@ -239,7 +239,7 @@ def get_maximum_price_from_display_price(displayPrice):
     
     # Handle a range price eg "$950,000 - $1,050,000"
     try:
-        return convert_to_integer(displayPrice.split("-")[1])
+        return convert_to_integer(re.split(r'-|to', displayPrice)[1])
     except:
         logger.critical(f"Unable to get_maximum_price_from_display_price for price: {displayPrice}")
         raise ValueError(f"Unable to get_maximum_price_from_display_price for price: {displayPrice}")
@@ -258,7 +258,7 @@ def get_min_max_price_from_display_price(displayPrice):
             get_maximum_price_from_display_price(displayPrice))
     
 def convert_to_integer(string):
-    return int(re.findall('\d+', string )[0])
+    return int(re.findall(r'\d+', string )[0])
 
 
 if __name__ == "__main__":

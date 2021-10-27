@@ -31,11 +31,13 @@ def test_get_minimum_price_from_display_price(raw_listing):
     displayPrice3 = "950,000-1,050,000"
     displayPrice4 = "950 ,000-1,050,000"
     displayPrice5 = "950,000 1,050,000" # Not currently handled
+    displayPrice6 = "$1,300,000 to $1,400,000"
     assert get_minimum_price_from_display_price(displayPrice1) == 950000
     assert get_minimum_price_from_display_price(displayPrice2) == 950000
     assert get_minimum_price_from_display_price(displayPrice3) == 950000
     assert get_minimum_price_from_display_price(displayPrice4) == 950000
     # assert get_minimum_price_from_display_price(displayPrice5) == 950000
+    assert get_minimum_price_from_display_price(displayPrice6) == 1300000
     
 def test_get_maximum_price_from_display_price(raw_listing):
     displayPrice1 = "$950,000 - $1,050,000"
@@ -43,11 +45,13 @@ def test_get_maximum_price_from_display_price(raw_listing):
     displayPrice3 = "950,000-1,050,000"
     displayPrice4 = "950 ,000-1,050,000"
     displayPrice5 = "950,000 1,050,000" # Not currently handled
+    displayPrice6 = "$1,300,000 to $1,400,000"
     assert get_maximum_price_from_display_price(displayPrice1) == 1050000
     assert get_maximum_price_from_display_price(displayPrice2) == 1050000
     assert get_maximum_price_from_display_price(displayPrice3) == 1050000
     assert get_maximum_price_from_display_price(displayPrice4) == 1050000
     # assert get_minimum_price_from_display_price(displayPrice5) == 950000
+    assert get_maximum_price_from_display_price(displayPrice6) == 1400000
     
 def test_get_min_max_price_from_display_price(raw_listing):
     displayPrice1 = "$950,000 - $1,050,000"
