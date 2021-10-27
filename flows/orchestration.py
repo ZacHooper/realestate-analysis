@@ -62,7 +62,7 @@ def get_new_listing_details(domain_key, listing_id):
         return listing
     except Exception as e:
         logger.critical(f"Unable to create listing class due to: {e}")
-        raise ValueError(f"Unable to create listing class due to: {e}")
+        raise ValueError(f"Unable to create listing class for listing ({listing_id}) due to: {e}")
 
 @task
 def add_new_listing_to_mongo(client, listing: Listing):
