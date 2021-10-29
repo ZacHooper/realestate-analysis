@@ -88,10 +88,15 @@ def which_new_listings(coll, listing_ids, return_existing = False):
     # Only return the ids in listing ids but NOT in existing ids
     return [x for x in listing_ids if x not in existing_listing_ids]
 
+def get_all_listings(coll):
+    listings = coll.find()
+    return list(listings)
+
 if __name__ == "__main__":
     client = connect_to_mongo_db()
-    domain_coll = connect_to_domain_raw_collection(client)
+    # domain_coll = connect_to_domain_raw_collection(client)
     listing_coll = connect_to_domain_listings(client)
-    listings = [2017273091, 2017272108, 2017278297, 12345, 67890, 9876, 54321]
-    new_listings = which_new_listings(listing_coll, listings)
-    print(new_listings)
+    # listings = [2017273091, 2017272108, 2017278297, 12345, 67890, 9876, 54321]
+    # new_listings = which_new_listings(listing_coll, listings)
+    # print(new_listings)
+    print(get_all_listings(listing_coll))
